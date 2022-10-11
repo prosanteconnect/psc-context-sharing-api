@@ -7,12 +7,12 @@
     "ps": {
       "title": "Ps",
       "description": "",
-      "#ref": "#/$defs/ps"
+      "$ref": "#/$defs/ps"
     },
     "patient" : {
       "title": "Patient",
       "description": "",
-      "ref": "#/$defs/patient"
+      "$ref": "#/$defs/patient"
     }
   },
   "required" : ["ps"],
