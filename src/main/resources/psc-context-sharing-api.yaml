@@ -2,7 +2,7 @@ openapi: 3.0.0
 servers:
   # Added by API Auto Mocking Plugin
   - description: Context sharing API backed on ProSanteConnect
-    url: https://github.com/prosanteconnect/psc-context-sharing-api
+    url: http://localhost:8080/psc-context-sharing/api
 info:
   version: "1.0.0"
   title: Context sharing API backed on ProSanteConnect
@@ -128,6 +128,26 @@ paths:
           description: Forbidden
         404:
           description: Not found
+    put:
+      summary: Put PsContext in cache
+      description: Put PsContext in cache
+      parameters:
+        - schema:
+            type: string
+          name: psId
+          in: path
+          required: true
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PsContext'
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
 components:
   schemas:
     PsContext:
@@ -147,4 +167,4 @@ components:
       scheme: bearer
       bearerFormat: JWT
 security:
-  - bearerAuth: []
+  - bearerAuth: [ ]
