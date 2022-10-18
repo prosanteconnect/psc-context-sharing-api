@@ -28,7 +28,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/PsContextSchema'
+                  $ref: '#/components/schemas/PscContextSchema'
         401:
           description: Unauthorized
         403:
@@ -45,7 +45,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PsContextSchema'
+                $ref: '#/components/schemas/PscContextSchema'
         401:
           description: Unauthorized
         403:
@@ -62,7 +62,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PsContextSchema'
+                $ref: '#/components/schemas/PscContextSchema'
         401:
           description: Unauthorized
         403:
@@ -83,7 +83,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PsContextSchema'
+                $ref: '#/components/schemas/PscContextSchema'
         401:
           description: Unauthorized
         403:
@@ -92,23 +92,23 @@ paths:
           description: Already exists
   /share:
     put:
-      summary: Put PsContext in cache
-      description: Put PsContext in cache
+      summary: Put PscContext in cache
+      description: Put PscContext in cache
       responses:
         200:
           description: Json schema successfully updated
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PsContext'
+                $ref: '#/components/schemas/PscContext'
         401:
           description: Unauthorized
         403:
           description: Forbidden
   /share/{psId}:
     get:
-      summary: Get PsContext from cache
-      description: Get PsContext from cache
+      summary: Get PscContext from cache
+      description: Get PscContext from cache
       parameters:
         - schema:
             type: string
@@ -121,7 +121,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PsContext'
+                $ref: '#/components/schemas/PscContext'
         401:
           description: Unauthorized
         403:
@@ -129,8 +129,8 @@ paths:
         404:
           description: Not found
     put:
-      summary: Put PsContext in cache
-      description: Put PsContext in cache
+      summary: Put PscContext in cache
+      description: Put PscContext in cache
       parameters:
         - schema:
             type: string
@@ -143,24 +143,29 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PsContext'
+                $ref: '#/components/schemas/PscContext'
         401:
           description: Unauthorized
         403:
           description: Forbidden
 components:
   schemas:
-    PsContext:
-      description: PsContext wrapper
+    PscContext:
+      description: PscContext wrapper
       type: object
       properties:
         schemaId:
           type: string
         bag:
           type: object
-    PsContextSchema:
-      description: psContext bag json-schema
+    PscContextSchema:
+      description: pscContext bag json-schema
       type: object
+      properties:
+        schemaId:
+          type: string
+        schema:
+          type: string
   securitySchemes:
     bearerAuth: # arbitrary name for the security scheme
       type: http

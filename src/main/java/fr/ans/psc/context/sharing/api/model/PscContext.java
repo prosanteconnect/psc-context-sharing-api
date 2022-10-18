@@ -10,6 +10,11 @@ public class PscContext {
     public PscContext() {
     }
 
+    public PscContext(String schemaId, Object bag) {
+        this.schemaId = schemaId;
+        this.bag = bag;
+    }
+
     public String getSchemaId() {
         return schemaId;
     }
