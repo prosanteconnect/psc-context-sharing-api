@@ -1,7 +1,10 @@
 package fr.ans.psc.context.sharing.api.service;
 
+import org.springframework.stereotype.Service;
+
 import java.util.List;
 
+@Service
 public class DiscoveryService {
 
     public List<String> getAllSchemas() {

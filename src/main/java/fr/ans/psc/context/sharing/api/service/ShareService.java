@@ -3,7 +3,9 @@ package fr.ans.psc.context.sharing.api.service;
 import fr.ans.psc.context.sharing.api.exception.PscCacheException;
 import fr.ans.psc.context.sharing.api.exception.PscUnauthorizedException;
 import fr.ans.psc.context.sharing.api.model.PscContext;
+import org.springframework.stereotype.Service;
 
+@Service
 public class ShareService {
 
     public void putPsContext(String accessToken, PscContext pscContext) throws PscUnauthorizedException, PscCacheException {
