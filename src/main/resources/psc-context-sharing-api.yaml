@@ -154,6 +154,8 @@ components:
       description: PscContext wrapper
       type: object
       properties:
+        psId:
+          type: string
         schemaId:
           type: string
         bag:
