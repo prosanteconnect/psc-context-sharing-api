@@ -13,8 +13,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 public class RedisConfiguration {
 
     @Bean
-    public RedisTemplate<String, PscContext> redisTemplate(RedisConnectionFactory connectionFactory) {
-        RedisTemplate<String, PscContext> template = new RedisTemplate<>();
+    public RedisTemplate<PscContext, String> redisTemplate(RedisConnectionFactory connectionFactory) {
+        RedisTemplate<PscContext, String> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
         return template;
     }
