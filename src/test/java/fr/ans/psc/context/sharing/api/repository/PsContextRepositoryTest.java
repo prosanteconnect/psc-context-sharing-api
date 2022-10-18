@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.redis.AutoConfigureDataRedis;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
-import redis.embedded.RedisServer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -32,5 +31,10 @@ public class PsContextRepositoryTest {
         assertNotNull(savedPscContext);
         assertEquals(pscContext.getBag(), savedPscContext.getBag());
         assertEquals("shared_data", savedPscContext.getBag());
+
+        PscContext foundCtx = ctxRepository.findById("1").get();
+        assertEquals("shared_data", foundCtx.getBag());
     }
+
+    //TODO test timeout
 }

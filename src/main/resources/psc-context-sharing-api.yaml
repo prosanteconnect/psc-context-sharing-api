@@ -160,6 +160,7 @@ components:
           type: string
         bag:
           type: object
+      required: ['schemaId', 'bag']
     PscContextSchema:
       description: pscContext bag json-schema
       type: object

@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema",
-  "id": "urn:jsonschema:fr:ans:psc:patient-info",
+  "$id": "urn:jsonschema:fr:ans:psc:patient-info",
   "description": "a context with basic Ps and patient infos",
   "type" : "object",
   "properties": {
@@ -16,6 +16,7 @@
     }
   },
   "required" : ["ps"],
+  "additionalProperties": false,
   "$defs": {
     "ps": {
       "type": "object",
@@ -37,7 +38,8 @@
         "companyCedexOffice": {"type":  "string"},
         "companyRegistrationAuthority": {"type":  "string"}
       },
-      "required": ["nationalId"]
+      "required": ["nationalId"],
+      "additionalProperties": false
     },
     "patient": {
       "type": "object",
@@ -45,7 +47,8 @@
         "patientINS": {"type":  "string"},
         "patientFirstName": {"type":  "string"},
         "patientLastName": {"type":  "string"}
-      }
+      },
+      "additionalProperties": false
     }
   }
 }

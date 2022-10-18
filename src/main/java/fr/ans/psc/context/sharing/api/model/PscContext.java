@@ -1,21 +1,25 @@
 package fr.ans.psc.context.sharing.api.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 
 @RedisHash("PscContext")
 public class PscContext {
     @Id
+    @JsonProperty("psId")
     String psId;
 
+    @JsonProperty(value = "schemaId", required = true)
     String schemaId;
 
-    Object bag;
+    @JsonProperty(value = "bag", required = true)
+    String bag;
 
     public PscContext() {
     }
 
-    public PscContext(String psId, String schemaId, Object bag) {
+    public PscContext(String psId, String schemaId, String bag) {
         this.psId = psId;
         this.schemaId = schemaId;
         this.bag = bag;
@@ -37,11 +41,11 @@ public class PscContext {
         this.schemaId = schemaId;
     }
 
-    public Object getBag() {
+    public String getBag() {
         return bag;
     }
 
-    public void setBag(Object bag) {
+    public void setBag(String bag) {
         this.bag = bag;
     }
 }
