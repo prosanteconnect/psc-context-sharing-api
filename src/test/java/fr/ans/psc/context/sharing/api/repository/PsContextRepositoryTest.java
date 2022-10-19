@@ -17,7 +17,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(classes = TestRedisConfiguration.class)
 @AutoConfigureDataRedis
-@AutoConfigureCache
 @ContextConfiguration(classes = ContextSharingApiApplication.class)
 public class PsContextRepositoryTest {
 

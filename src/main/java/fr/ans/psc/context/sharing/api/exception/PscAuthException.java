@@ -2,12 +2,13 @@ package fr.ans.psc.context.sharing.api.exception;
 
 import org.springframework.http.HttpStatus;
 
-public class PscCacheException extends PscContextSharingException {
-    public PscCacheException() {
+public class PscAuthException extends PscContextSharingException {
+
+    public PscAuthException() {
         super();
     }
 
-    public PscCacheException(HttpStatus status) {
+    public PscAuthException(HttpStatus status) {
         super(status);
     }
 }

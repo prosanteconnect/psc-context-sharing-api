@@ -1,4 +1,13 @@
 package fr.ans.psc.context.sharing.api.exception;
 
-public class PscSchemaException extends Exception {
+import org.springframework.http.HttpStatus;
+
+public class PscSchemaException extends PscContextSharingException {
+    public PscSchemaException() {
+        super();
+    }
+
+    public PscSchemaException(HttpStatus status) {
+        super(status);
+    }
 }

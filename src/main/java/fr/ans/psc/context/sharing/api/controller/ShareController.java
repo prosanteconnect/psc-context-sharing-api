@@ -1,16 +1,24 @@
 package fr.ans.psc.context.sharing.api.controller;
 
-import fr.ans.psc.context.sharing.api.exception.PscCacheException;
-import fr.ans.psc.context.sharing.api.exception.PscMissingAccessTokenException;
-import fr.ans.psc.context.sharing.api.exception.PscUnauthorizedException;
+import fr.ans.psc.context.sharing.api.exception.*;
 import fr.ans.psc.context.sharing.api.model.PscContext;
 import fr.ans.psc.context.sharing.api.service.PscAuthService;
 import fr.ans.psc.context.sharing.api.service.ShareService;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+
+@Slf4j
 @RestController
 @RequestMapping("/share")
 public class ShareController {
@@ -21,53 +29,64 @@ public class ShareController {
     @Autowired
     private ShareService shareService;
 
-    @GetMapping("/{psId}")
-    public ResponseEntity<PscContext> getPsContextFromCache(@PathVariable String psId) {
-        //TODO check token presence. if not return forbidden
-        String accessToken = "accesToken";
-        String nationalId;
-        PscContext pscContext;
-
+    @GetMapping()
+    public ResponseEntity<PscContext> getPsContextFromCache() {
         try {
-            nationalId = authService.introspectPscAccesToken(accessToken);
-        } catch (PscMissingAccessTokenException e) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        } catch (PscUnauthorizedException e) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            String accessToken = getAccessToken();
+            String nationalId = authService.introspectPscAccesToken(accessToken);
+            PscContext pscContext = shareService.getPscContext(nationalId);
+            return new ResponseEntity<>(pscContext, HttpStatus.OK);
+        } catch (PscContextSharingException e) {
+            return new ResponseEntity<>(e.getStatus());
         }
-
-        //TODO call service, handle ex and return PscContext
-        try {
-            pscContext = shareService.getPscContext(nationalId);
-        } catch (PscCacheException e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
-        return new ResponseEntity<>(pscContext, HttpStatus.OK);
     }
 
-    @PutMapping("/{psId}")
+    @PutMapping(consumes = {"application/json"}, produces = {"application/json"})
     public ResponseEntity<PscContext> putPscContextInCache(@RequestBody PscContext pscContext) {
-        //TODO check token presence. if not return forbidden
-        String accessToken = "accesToken";
-        String nationalId;
-        PscContext savedContext;
-
         try {
-            nationalId = authService.introspectPscAccesToken(accessToken);
-        } catch (PscMissingAccessTokenException e) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        } catch (PscUnauthorizedException e) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        }
-
-        //TODO call service, handle ex and return PscContext
-        try {
+            String accessToken = getAccessToken();
+            String nationalId = authService.introspectPscAccesToken(accessToken);
             pscContext.setPsId(nationalId);
-            savedContext = shareService.putPsContext(pscContext);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            PscContext savedContext = shareService.putPsContext(pscContext);
+            return new ResponseEntity<>(savedContext, HttpStatus.OK);
+        } catch (PscContextSharingException e) {
+            return new ResponseEntity<>(e.getStatus());
         }
-        return new ResponseEntity<>(savedContext, HttpStatus.OK);
+    }
+
+    /**
+     * Gets the accessToken
+     *
+     * @return the PSC accessToken
+     */
+    public String getAccessToken() throws PscMissingAccessTokenException {
+        List<String> tmp = new ArrayList<String>();
+        String headerNameAuthorization = "Authorization";
+        Enumeration<String> tokens = getHttpRequest().getHeaders(headerNameAuthorization);
+        while (tokens.hasMoreElements()) {
+            log.debug("Au moins un header 'Authorization' trouvé ");
+            String token = tokens.nextElement();
+            String tokenHeaderPrefixBearer = "Bearer";
+            if (token.startsWith(tokenHeaderPrefixBearer)) {
+                tmp.add(StringUtils.deleteWhitespace(token).substring(tokenHeaderPrefixBearer.length()));
+                log.debug("token 'Bearer' trouvé dans un header 'Authorization': {} ", token);
+            }
+        }
+        if (tmp.size() != 1) {
+            throw new PscMissingAccessTokenException(HttpStatus.FORBIDDEN);
+        }
+        log.debug("accessToken received (without prefix): {}", tmp.get(0));
+
+        return tmp.get(0);
+    }
+
+    /**
+     * Gets the HttpServletRequest
+     *
+     * @return the HttpServletRequest
+     */
+    public HttpServletRequest getHttpRequest() {
+        ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+        return attrs.getRequest();
     }
 }
