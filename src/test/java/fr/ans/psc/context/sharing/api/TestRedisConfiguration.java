@@ -1,6 +1,5 @@
 package fr.ans.psc.context.sharing.api;
 
-import org.junit.runner.RunWith;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.boot.test.context.TestConfiguration;
 import redis.embedded.RedisServer;

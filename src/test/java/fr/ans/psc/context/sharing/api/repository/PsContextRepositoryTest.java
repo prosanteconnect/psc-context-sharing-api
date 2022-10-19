@@ -3,20 +3,21 @@ package fr.ans.psc.context.sharing.api.repository;
 import fr.ans.psc.context.sharing.api.ContextSharingApiApplication;
 import fr.ans.psc.context.sharing.api.TestRedisConfiguration;
 import fr.ans.psc.context.sharing.api.model.PscContext;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.core.AutoConfigureCache;
 import org.springframework.boot.test.autoconfigure.data.redis.AutoConfigureDataRedis;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(classes = TestRedisConfiguration.class)
 @AutoConfigureDataRedis
+@AutoConfigureCache
 @ContextConfiguration(classes = ContextSharingApiApplication.class)
 public class PsContextRepositoryTest {
 
@@ -36,5 +37,35 @@ public class PsContextRepositoryTest {
         assertEquals("shared_data", foundCtx.getBag());
     }
 
-    //TODO test timeout
+    @Test
+    @DisplayName("should update context")
+    public void shouldReplacePscContext() {
+        PscContext firstContext = new PscContext("1", "schema", "first_version");
+        PscContext firstSaved = ctxRepository.save(firstContext);
+
+        PscContext secondContext = new PscContext("1", "schema", "second_version");
+        PscContext secondSaved = ctxRepository.save(secondContext);
+
+        assertNotEquals(firstSaved, secondSaved);
+        assertNotEquals(firstSaved.getBag(), secondSaved.getBag());
+        assertEquals("second_version", secondSaved.getBag());
+        assertEquals("second_version", ctxRepository.findById("1").get().getBag());
+    }
+
+    // this test should only be enabled manually :
+    // Spring Data Redis sets TimeToLive via @RedisHash annotation of model class
+    //
+    // I don't know how to override this value or set it dynamically
+    // and I don't want to wait the current required duration
+    @Test
+    @DisplayName("should not be available after TTL")
+    @Disabled
+    public void shouldFlushAfterTtlTest() throws InterruptedException {
+        final PscContext pscContext = new PscContext("1", "schema", "shared_data");
+        final PscContext savedPscContext = ctxRepository.save(pscContext);
+
+        assertTrue(ctxRepository.existsById("1"));
+        Thread.sleep(6000);
+        assertFalse(ctxRepository.existsById("1"));
+    }
 }

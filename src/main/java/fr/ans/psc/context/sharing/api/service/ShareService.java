@@ -27,21 +27,17 @@ public class ShareService {
     private PscContextRepository pscContextRepository;
 
     public PscContext putPsContext(PscContext pscContext) throws PscCacheException, PscSchemaException {
-        // TODO : check conformity of data bag
         validateSchemaConformity(pscContext);
-
-        // TODO : put to Redis
+        PscContext saved;
         try {
-            pscContextRepository.save(pscContext);
+            saved = pscContextRepository.save(pscContext);
         } catch (Exception e) {
             throw new PscCacheException();
         }
-
-        return null;
+        return saved;
     }
 
     public PscContext getPscContext(String nationalId) throws PscCacheException {
-        // TODO : get from Redis
         PscContext pscContext;
         try {
             pscContext = pscContextRepository.findById(nationalId).get();
@@ -52,12 +48,11 @@ public class ShareService {
     }
 
     private void validateSchemaConformity(PscContext pscContext) throws PscSchemaException {
-        JsonSchemaFactory factory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V4);
-        JsonSchema jsonSchema = factory.getSchema(
-                PscContext.class.getResourceAsStream("/" + pscContext.getSchemaId() + ".json")
-        );
-
         try {
+            JsonSchemaFactory factory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V4);
+            JsonSchema jsonSchema = factory.getSchema(
+                    PscContext.class.getResourceAsStream("/" + pscContext.getSchemaId() + ".json")
+            );
             JsonNode jsonNode = mapper.readTree(pscContext.getBag());
 
             Set<ValidationMessage> errors = jsonSchema.validate(jsonNode);
@@ -65,10 +60,9 @@ public class ShareService {
                 log.error("Json-schema validation failed");
                 throw new PscSchemaException();
             }
-        } catch (JsonProcessingException e) {
-            log.error("Submitted json-schema has format errors");
+        } catch (JsonProcessingException | IllegalArgumentException e) {
+            log.error(e instanceof JsonProcessingException ? "Submitted json-schema has format errors" : "Unknown schema submitted");
             throw new PscSchemaException();
         }
-
     }
 }
