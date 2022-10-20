@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.Gson;
 import fr.ans.psc.context.sharing.api.exception.PscAuthException;
+import fr.ans.psc.context.sharing.api.exception.PscContextSharingException;
 import fr.ans.psc.context.sharing.api.model.prosanteconnect.UserInfos;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,28 +24,28 @@ import java.util.*;
 public class PscAuthService {
 
     @Value("${psc.url.introspection}")
-    public String pscUrlIntrospection;
+    private String pscUrlIntrospection;
 
     @Value("${psc.url.userinfo}")
-    public String pscUrlUserInfo;
+    private String pscUrlUserInfo;
 
 
     @Value("${psc.clientID}")
-    public String pscClientID;
+    private String pscClientID;
 
     @Value("${psc.clientSecret}")
-    public String pscSecret;
+    private String pscSecret;
+
+    private ObjectMapper mapper = new ObjectMapper();
 
     public String introspectPscAccesToken(String accessToken) throws PscAuthException {
         introspect(accessToken);
-        UserInfos userInfos = new UserInfos();
-        userInfos = getUserInfos(accessToken);
+        UserInfos userInfos = getUserInfos(accessToken);
 
         return userInfos.getSubjectNameID();
     }
 
     private void introspect(String accessToken) throws PscAuthException {
-
         RestTemplate restTemplate = new RestTemplate();
         log.debug("uri connection à ProSanteConnect: {}", pscUrlIntrospection);
         log.debug("ClientID pour proSanteConnect: {}", pscClientID);
@@ -54,15 +55,14 @@ public class PscAuthService {
         params.add("token", accessToken);
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(params, getHeadersIntrospection());
         ResponseEntity<String> result = restTemplate.postForEntity(pscUrlIntrospection, requestEntity, String.class);
-
         log.debug("Appel ProSanteConnect Reponse: StatusCode {} \n body: {}", result.getStatusCode(),
                 result.getBody());
 
         parsePscResponse(result.getBody());
+
     }
 
-    private UserInfos getUserInfos(String accessToken) {
-        Gson gson = new Gson();
+    private UserInfos getUserInfos(String accessToken) throws PscAuthException {
         RestTemplate restTemplate = new RestTemplate();
         log.debug("uri connection à ProSanteConnect: {}", pscUrlUserInfo);
         log.debug("ClientID pour proSanteConnect: {}", pscClientID);
@@ -73,7 +73,14 @@ public class PscAuthService {
         log.debug("Appel ProSanteConnect pour getUserInfo. Reponse: StatusCode {} \n body: {}", result.getStatusCode(),
                 result.getBody());
 
-        return gson.fromJson(result.getBody(), UserInfos.class);
+        UserInfos ui;
+        try {
+            ui = mapper.readValue(result.getBody(), UserInfos.class);
+        } catch (JsonProcessingException e) {
+            log.error("Error occurred while parsing UserInfos");
+            throw new PscAuthException();
+        }
+        return ui;
     }
 
     /*
@@ -115,16 +122,16 @@ public class PscAuthService {
                 String token_active_field = node.get(tokenActiveField).asText();
                 String tokenActiveTrue = "true";
                 if (!token_active_field.equalsIgnoreCase(tokenActiveTrue)) {
-                    log.error("Le token fourni n'est pas reconnu comme un token valide");
+                    log.error("The provided token is not valid");
                     throw new PscAuthException(HttpStatus.UNAUTHORIZED);
                 }
             } else {
-                log.error("Reponse invalide introspection PSC: champ {} non trouvé", tokenActiveField);
+                log.error("Invalid PSC introspection response : {} field not found", tokenActiveField);
                 throw new PscAuthException();
             }
 
         } catch (JsonProcessingException e) {
-            log.error("Erreur technique durant le parse de la reponse d'intropection PSC: champ {} ", e.getMessage());
+            log.error("Technical error during PSC introspect parsing : {} field", e.getMessage());
             log.debug(e.toString());
             throw new PscAuthException();
         }

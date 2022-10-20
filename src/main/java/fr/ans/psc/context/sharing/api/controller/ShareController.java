@@ -32,8 +32,10 @@ public class ShareController {
     @GetMapping()
     public ResponseEntity<PscContext> getPsContextFromCache() {
         try {
+            log.debug("Get context requested");
             String accessToken = getAccessToken();
             String nationalId = authService.introspectPscAccesToken(accessToken);
+            log.debug("PS key is {}", nationalId);
             PscContext pscContext = shareService.getPscContext(nationalId);
             return new ResponseEntity<>(pscContext, HttpStatus.OK);
         } catch (PscContextSharingException e) {
@@ -44,8 +46,10 @@ public class ShareController {
     @PutMapping(consumes = {"application/json"}, produces = {"application/json"})
     public ResponseEntity<PscContext> putPscContextInCache(@RequestBody PscContext pscContext) {
         try {
+            log.debug("Put context requested");
             String accessToken = getAccessToken();
             String nationalId = authService.introspectPscAccesToken(accessToken);
+            log.debug("PS key is {}", nationalId);
             pscContext.setPsId(nationalId);
             PscContext savedContext = shareService.putPsContext(pscContext);
             return new ResponseEntity<>(savedContext, HttpStatus.OK);
@@ -64,15 +68,16 @@ public class ShareController {
         String headerNameAuthorization = "Authorization";
         Enumeration<String> tokens = getHttpRequest().getHeaders(headerNameAuthorization);
         while (tokens.hasMoreElements()) {
-            log.debug("Au moins un header 'Authorization' trouvé ");
+            log.debug("At least one 'Authorization' header has been found");
             String token = tokens.nextElement();
             String tokenHeaderPrefixBearer = "Bearer";
             if (token.startsWith(tokenHeaderPrefixBearer)) {
                 tmp.add(StringUtils.deleteWhitespace(token).substring(tokenHeaderPrefixBearer.length()));
-                log.debug("token 'Bearer' trouvé dans un header 'Authorization': {} ", token);
+                log.debug("'Bearer' token found in an 'Authorization' header: {} ", token);
             }
         }
         if (tmp.size() != 1) {
+            log.error("No access token provided");
             throw new PscMissingAccessTokenException(HttpStatus.FORBIDDEN);
         }
         log.debug("accessToken received (without prefix): {}", tmp.get(0));

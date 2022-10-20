@@ -32,6 +32,7 @@ public class ShareService {
         try {
             saved = pscContextRepository.save(pscContext);
         } catch (Exception e) {
+            e.printStackTrace();
             throw new PscCacheException();
         }
         return saved;
