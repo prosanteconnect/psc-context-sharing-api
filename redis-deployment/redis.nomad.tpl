@@ -2,6 +2,7 @@ job "redis-share-context" {
   datacenters = [
     "${datacenter}"]
   type = "service"
+  namespace = "${nomad_namespace}"
 
   vault {
     policies = [
