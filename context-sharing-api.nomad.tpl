@@ -65,7 +65,7 @@ psc.clientSecret={{ .Data.data.psc_client_secret }}
 
 spring.redis.database=0
 spring.redis.host={{ range service "${nomad_namespace}-redis-share-context" }}{{ .Address }}{{ end }}
-spring.redis.port={{ range service "${nomad_namespace}-redis-share-context" }}{{ .Address }}{{ end }}
+spring.redis.port={{ range service "${nomad_namespace}-redis-share-context" }}{{ .Port }}{{ end }}
 {{ with secret "psc-ecosystem/${nomad_namespace}" }}
 spring.redis.username={{ .Data.data.redis_username }}
 spring.redis.password={{ .Data.data.redis_password }}
