@@ -28,7 +28,7 @@ job "psc-context-sharing" {
       }
     }
 
-    task {
+    task "api" {
       driver = "docker"
 
       config {
