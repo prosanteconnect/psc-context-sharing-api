@@ -1,9 +1,11 @@
 job "redis-share-context" {
-  datacenters = ["${datacenter}"]
+  datacenters = [
+    "${datacenter}"]
   type = "service"
 
   vault {
-    policies = ["psc-ecosystem"]
+    policies = [
+      "psc-ecosystem"]
     change_mode = "restart"
   }
 
@@ -19,11 +21,13 @@ job "redis-share-context" {
 
     constraint {
       attribute = "$\u007Bnode.class\u007D"
-      value     = "data"
+      value = "data"
     }
 
     network {
-      port "db" { to = 6379 }
+      port "db" {
+        to = 6379
+      }
     }
 
     task "redis" {
@@ -42,7 +46,8 @@ EOH
 
       config {
         image = "${image}:${tag}"
-        ports = ["db"]
+        ports = [
+          "db"]
         type = "bind"
         target = "/usr/local/etc/redis/redis.conf"
         source = "secrets/redis.conf"
@@ -51,8 +56,6 @@ EOH
           propagation = "rshared"
         }
       }
-
-    }
 
       resources {
         cpu = 500
@@ -63,13 +66,14 @@ EOH
         name = "$\u007BNOMAD_NAMESPACE\u007D-$\u007BNOMAD_JOB_NAME\u007D"
         port = "db"
         check {
-          name         = "alive"
-          type         = "tcp"
-          interval     = "30s"
-          timeout      = "5s"
+          name = "alive"
+          type = "tcp"
+          interval = "30s"
+          timeout = "5s"
           failures_before_critical = 3
-          port         = "db"
+          port = "db"
         }
       }
     }
   }
+}
