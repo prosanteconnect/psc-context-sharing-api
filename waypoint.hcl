@@ -8,7 +8,7 @@ runner {
   enabled = true
   profile = "share_context-${workspace.name}"
   data_source "git" {
-    url = ""
+    url = "https://github.com/prosanteconnect/psc-context-sharing-api.git"
     ref = "${workspace.name}"
   }
   poll {
