@@ -1,11 +1,9 @@
 job "redis-share-context" {
-  datacenters = [
-    "${datacenter}"]
+  datacenters = ["${datacenter}"]
   type = "service"
 
   vault {
-    policies = [
-      "psc-ecosystem"]
+    policies = ["psc-ecosystem"]
     change_mode = "restart"
   }
 
@@ -37,7 +35,7 @@ job "redis-share-context" {
         destination = "secrets/redis.conf"
         change_mode = "restart"
         data = <<EOH
-{{ with secret "psc-ecosystem/{nomad_namespace}" }}
+{{ with secret "psc-ecosystem/${nomad_namespace}" }}
 user {{ .Data.data.redis_username }}
 requirepass {{ .Data.data.redis_password }}
 {{ end }}
