@@ -49,7 +49,7 @@ EOH
       #application.properties
       template {
         destination = "secrets/application.properties"
-        change_mode = restart
+        change_mode = "restart"
         data = <<EOF
 spring.application.name=psc-context-sharing-api
 server.servlet.contextPath=/psc-context-sharing/api
