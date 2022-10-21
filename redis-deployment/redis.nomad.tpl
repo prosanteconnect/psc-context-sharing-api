@@ -1,9 +1,11 @@
 job "redis-share-context" {
-  datacenters = ["${datacenter}"]
+  datacenters = [
+    "${datacenter}"]
   type = "service"
 
   vault {
-    policies = ["psc-ecosystem"]
+    policies = [
+      "psc-ecosystem"]
     change_mode = "restart"
   }
 
@@ -46,12 +48,15 @@ EOH
         image = "${image}:${tag}"
         ports = [
           "db"]
-        type = "bind"
-        target = "/usr/local/etc/redis/redis.conf"
-        source = "secrets/redis.conf"
-        readonly = false
-        bind_options {
-          propagation = "rshared"
+
+        mount {
+          type = "bind"
+          target = "/usr/local/etc/redis/redis.conf"
+          source = "secrets/redis.conf"
+          readonly = false
+          bind_options {
+            propagation = "rshared"
+          }
         }
       }
 
