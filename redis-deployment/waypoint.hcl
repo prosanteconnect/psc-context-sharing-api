@@ -26,7 +26,7 @@ app "psc/share-context/redis" {
     }
     registry {
       use "docker" {
-        image = "prosanteconnect/psc-elasticsearch"
+        image = var.image
         tag = var.tag
         username = var.registry_username
         password = var.registry_password
