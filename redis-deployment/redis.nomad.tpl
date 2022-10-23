@@ -39,7 +39,7 @@ job "redis-share-context" {
         change_mode = "restart"
         data = <<EOH
 {{ with secret "psc-ecosystem/${nomad_namespace}" }}
-user {{ .Data.data.redis_username }}
+#user {{ .Data.data.redis_username }}
 requirepass {{ .Data.data.redis_password }}
 {{ end }}
 EOH
