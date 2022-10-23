@@ -55,6 +55,7 @@ public class ShareService {
             }
         } catch (Exception e) {
             log.error("Error occurred while requesting Redis server");
+            e.printStackTrace();
             throw new PscCacheException();
         }
         return pscContext;
