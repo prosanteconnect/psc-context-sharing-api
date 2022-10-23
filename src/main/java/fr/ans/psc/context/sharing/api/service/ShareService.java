@@ -36,29 +36,28 @@ public class ShareService {
             saved = pscContextRepository.save(pscContext);
             log.debug("Entry for key {} successfully saved", pscContext.getPsId());
         } catch (Exception e) {
-            log.error("Error occurred while requesting Redis server");
+            log.error("Error occurred while requesting Redis server", e);
             throw new PscCacheException();
         }
         return saved;
     }
 
     public PscContext getPscContext(String nationalId) throws PscCacheException {
-        PscContext pscContext;
+        Optional<PscContext> optionalContext;
+
         try {
             log.debug("requesting Redis server for key {}...", nationalId);
-            Optional<PscContext> optional = pscContextRepository.findById(nationalId);
-            if (optional.isPresent()) {
-                pscContext = optional.get();
-            } else {
-                log.debug("No entry for key {}", nationalId);
-                throw new PscCacheException(HttpStatus.NOT_FOUND);
-            }
+            optionalContext = pscContextRepository.findById(nationalId);
         } catch (Exception e) {
-            log.error("Error occurred while requesting Redis server");
-            e.printStackTrace();
+            log.error("Error occurred while requesting Redis server", e);
             throw new PscCacheException();
         }
-        return pscContext;
+
+        if (optionalContext.isEmpty()) {
+            log.debug("No entry for key {}", nationalId);
+            throw new PscCacheException(HttpStatus.NOT_FOUND);
+        }
+        return optionalContext.get();
     }
 
     private void validateSchemaConformity(PscContext pscContext) throws PscSchemaException {
