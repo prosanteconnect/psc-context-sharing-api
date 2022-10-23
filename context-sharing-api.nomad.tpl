@@ -80,7 +80,7 @@ EOF
 
       service {
         name = "$\u007BNOMAD_NAMESPACE\u007D-$\u007BNOMAD_JOB_NAME\u007D"
-        tags = ["urlprefix-/psc-context-sharing/"]
+        tags = ["urlprefix-$\u007BPUBLIC_HOSTNAME\u007D/psc-context-sharing/"]
         port = "http"
         check {
           type = "http"
