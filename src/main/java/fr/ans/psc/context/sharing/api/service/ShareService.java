@@ -64,8 +64,8 @@ public class ShareService {
         try {
             JsonSchemaFactory factory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V4);
             JsonSchema jsonSchema = factory.getSchema(
-                    PscContext.class.getResourceAsStream("/" + pscContext.getSchemaId() + ".json")
-            );
+                    PscContext.class.getResourceAsStream("/" + pscContext.getSchemaId() + ".json"));
+
             String jsonString = mapper.writeValueAsString(pscContext.getBag());
             JsonNode jsonNode = mapper.readTree(jsonString);
 
