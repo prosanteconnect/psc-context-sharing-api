@@ -50,8 +50,9 @@ public class ShareController {
             String accessToken = getAccessToken();
             String nationalId = authService.introspectPscAccesToken(accessToken);
             log.debug("PS key is {}", nationalId);
+            PscContext toStore = new PscContext(null, pscContext.getSchemaId(), pscContext.getBag());
             pscContext.setPsId(nationalId);
-            PscContext savedContext = shareService.putPsContext(pscContext);
+            PscContext savedContext = shareService.putPsContext(toStore);
             return new ResponseEntity<>(savedContext, HttpStatus.OK);
         } catch (PscContextSharingException e) {
             return new ResponseEntity<>(e.getStatus());
