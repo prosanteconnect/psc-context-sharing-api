@@ -15,12 +15,12 @@ public class PscContext {
     String schemaId;
 
     @JsonProperty(value = "bag", required = true)
-    String bag;
+    Object bag;
 
     public PscContext() {
     }
 
-    public PscContext(String psId, String schemaId, String bag) {
+    public PscContext(String psId, String schemaId, Object bag) {
         this.psId = psId;
         this.schemaId = schemaId;
         this.bag = bag;
@@ -42,11 +42,11 @@ public class PscContext {
         this.schemaId = schemaId;
     }
 
-    public String getBag() {
+    public Object getBag() {
         return bag;
     }
 
-    public void setBag(String bag) {
+    public void setBag(Object bag) {
         this.bag = bag;
     }
 }

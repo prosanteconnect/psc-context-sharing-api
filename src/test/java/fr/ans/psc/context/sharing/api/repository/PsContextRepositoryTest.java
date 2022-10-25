@@ -3,6 +3,7 @@ package fr.ans.psc.context.sharing.api.repository;
 import fr.ans.psc.context.sharing.api.ContextSharingApiApplication;
 import fr.ans.psc.context.sharing.api.TestRedisConfiguration;
 import fr.ans.psc.context.sharing.api.model.PscContext;
+import fr.ans.psc.context.sharing.api.utils.PscContextBuilder;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,7 +25,7 @@ public class PsContextRepositoryTest {
 
     @Test
     public void shouldSavePscContext_toRedis() {
-        final PscContext pscContext = new PscContext("1", "schema", "shared_data");
+        final PscContext pscContext = new PscContextBuilder().withPsId("1").withSchemaId("schema").withSimpleBag("shared_data").build();
         final PscContext savedPscContext = ctxRepository.save(pscContext);
 
         assertNotNull(savedPscContext);
@@ -38,10 +39,10 @@ public class PsContextRepositoryTest {
     @Test
     @DisplayName("should update context")
     public void shouldReplacePscContext() {
-        PscContext firstContext = new PscContext("1", "schema", "first_version");
+        PscContext firstContext = new PscContextBuilder().withPsId("1").withSchemaId("schema").withSimpleBag("first_version").build();
         PscContext firstSaved = ctxRepository.save(firstContext);
 
-        PscContext secondContext = new PscContext("1", "schema", "second_version");
+        PscContext secondContext = new PscContextBuilder().withPsId("1").withSchemaId("schema").withSimpleBag("second_version").build();
         PscContext secondSaved = ctxRepository.save(secondContext);
 
         assertNotEquals(firstSaved, secondSaved);
@@ -59,7 +60,7 @@ public class PsContextRepositoryTest {
     @DisplayName("should not be available after TTL")
     @Disabled
     public void shouldFlushAfterTtlTest() throws InterruptedException {
-        final PscContext pscContext = new PscContext("1", "schema", "shared_data");
+        final PscContext pscContext = new PscContextBuilder().withPsId("1").withSchemaId("schema").withSimpleBag("shared_data").build();
         final PscContext savedPscContext = ctxRepository.save(pscContext);
 
         assertTrue(ctxRepository.existsById("1"));

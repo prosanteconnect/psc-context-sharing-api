@@ -66,7 +66,8 @@ public class ShareService {
             JsonSchema jsonSchema = factory.getSchema(
                     PscContext.class.getResourceAsStream("/" + pscContext.getSchemaId() + ".json")
             );
-            JsonNode jsonNode = mapper.readTree(pscContext.getBag());
+            String jsonString = mapper.writeValueAsString(pscContext.getBag());
+            JsonNode jsonNode = mapper.readTree(jsonString);
 
             Set<ValidationMessage> errors = jsonSchema.validate(jsonNode);
             if (!errors.isEmpty()) {

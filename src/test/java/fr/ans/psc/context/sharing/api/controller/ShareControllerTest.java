@@ -11,12 +11,15 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import com.google.gson.Gson;
 import fr.ans.psc.context.sharing.api.ContextSharingApiApplication;
 import fr.ans.psc.context.sharing.api.TestRedisConfiguration;
+import fr.ans.psc.context.sharing.api.model.PatientInfo;
+import fr.ans.psc.context.sharing.api.model.Ps;
 import fr.ans.psc.context.sharing.api.model.PscContext;
 import fr.ans.psc.context.sharing.api.model.prosanteconnect.UserInfos;
 import fr.ans.psc.context.sharing.api.repository.PscContextRepository;
 import fr.ans.psc.context.sharing.api.service.PscAuthService;
 import fr.ans.psc.context.sharing.api.service.ShareService;
 import fr.ans.psc.context.sharing.api.utils.MemoryAppender;
+import fr.ans.psc.context.sharing.api.utils.PscContextBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -183,10 +186,8 @@ public class ShareControllerTest {
         httpMockServer.stubFor(WireMock.get("/userinfo").willReturn(aResponse().withStatus(200).withBody(userInfosJson)));
 
         // mock API calls
-        PscContext pscContext = new PscContext(null, "patient-info", "{\"ps\":{\"nationalId\":\"899700218896\"}}");
-        String requestContentJson = gson.toJson(pscContext, PscContext.class);
-        PscContext savedContext = new PscContext("899700218896", pscContext.getSchemaId(), pscContext.getBag());
-        String responseContentJson = gson.toJson(savedContext, PscContext.class);
+        String requestContentJson = "{\"schemaId\":\"patient-info\",\"bag\":{\"ps\":{\"nationalId\":\"123\"}}}";
+        String responseContentJson = "{\"psId\":\"899700218896\",\"schemaId\":\"patient-info\",\"bag\":{\"ps\":{\"nationalId\":\"123\"}}}";
 
         // put request
         ResultActions putRequest = mockMvc.perform(put("/share")
@@ -208,7 +209,13 @@ public class ShareControllerTest {
         httpMockServer.stubFor(WireMock.get("/userinfo").willReturn(aResponse().withStatus(200).withBody(userInfosJson)));
 
         // populate Redis
-        PscContext storedContext = new PscContext("899700218896", "patient-info", "{\"ps\":{\"nationalId\":\"899700218896\"}}");
+        PscContext storedContext = new PscContextBuilder()
+                .withPsId("899700218896")
+                .withSchemaId("patient-info")
+                .withPatientInfoBag()
+                .withPsNationalId("899700218896")
+                .build();
+
         pscContextRepository.save(storedContext);
         String responseContentJson = gson.toJson(storedContext, PscContext.class);
 
@@ -219,6 +226,7 @@ public class ShareControllerTest {
                 .contentType(APPLICATION_JSON)
                 .characterEncoding(StandardCharsets.UTF_8))
                 .andExpect(status().is(200))
-                .andExpect(content().json(responseContentJson));
+                .andExpect(content().json(responseContentJson))
+                .andDo(print());
     }
 }
