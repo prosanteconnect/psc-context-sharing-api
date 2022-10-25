@@ -46,7 +46,9 @@
       "properties": {
         "patientINS": {"type":  "string"},
         "patientFirstName": {"type":  "string"},
-        "patientLastName": {"type":  "string"}
+        "patientLastName": {"type":  "string"},
+        "patientCivilStatus": {"type":  "string"},
+        "patientDateOfBirth": {"type":  "string"}
       },
       "additionalProperties": false
     }
