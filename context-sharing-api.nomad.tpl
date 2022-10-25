@@ -34,6 +34,19 @@ job "psc-context-sharing" {
       config {
         image = "${artifact.image}:${artifact.tag}"
         ports = ["http"]
+        mount {
+          type = "bind"
+          target = "/app/json-schemas-repo/patient-info.json"
+          source = "/local/patient-info.json"
+          readonly = "false"
+          bind_options {
+            propagation = "rshared"
+          }
+        }
+      }
+
+      artifact {
+        source = "https://github.com/prosanteconnect/sharing-json-schemas/raw/main/json-schemas.zip"
       }
 
       # env variables
@@ -70,6 +83,7 @@ spring.redis.port={{ range service "${nomad_namespace}-redis-share-context" }}{{
 #spring.redis.username={{ .Data.data.redis_username }}
 spring.redis.password={{ .Data.data.redis_password }}
 {{ end }}
+schemas.file.repository=/app/json-schemas-repo
 EOF
       }
 

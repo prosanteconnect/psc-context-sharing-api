@@ -13,15 +13,23 @@ import fr.ans.psc.context.sharing.api.model.PscContext;
 import fr.ans.psc.context.sharing.api.repository.PscContextRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.Optional;
 import java.util.Set;
 
 @Service
 @Slf4j
 public class ShareService {
+
+    @Value("${schemas.file.repository}")
+    private String schemasFileRepository;
 
     private ObjectMapper mapper = new ObjectMapper();
 
@@ -63,8 +71,10 @@ public class ShareService {
     private void validateSchemaConformity(PscContext pscContext) throws PscSchemaException {
         try {
             JsonSchemaFactory factory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V4);
-            JsonSchema jsonSchema = factory.getSchema(
-                    PscContext.class.getResourceAsStream("/" + pscContext.getSchemaId() + ".json"));
+            File jsonSchemaFile = new File(schemasFileRepository, pscContext.getSchemaId() + ".json");
+            System.out.println(jsonSchemaFile.getAbsolutePath());
+            InputStream inputStream = new FileInputStream(jsonSchemaFile);
+            JsonSchema jsonSchema = factory.getSchema(inputStream);
 
             String jsonString = mapper.writeValueAsString(pscContext.getBag());
             JsonNode jsonNode = mapper.readTree(jsonString);
@@ -74,7 +84,7 @@ public class ShareService {
                 log.error("Json-schema validation failed");
                 throw new PscSchemaException();
             }
-        } catch (JsonProcessingException | IllegalArgumentException e) {
+        } catch (JsonProcessingException | FileNotFoundException | IllegalArgumentException e) {
             log.error(e instanceof JsonProcessingException ? "Submitted json-schema has format errors" : "Unknown schema submitted");
             throw new PscSchemaException();
         }
