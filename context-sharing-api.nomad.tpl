@@ -31,6 +31,10 @@ job "psc-context-sharing" {
     task "api" {
       driver = "docker"
 
+      artifact {
+        source = "https://github.com/prosanteconnect/sharing-json-schemas/raw/main/json-schemas.zip"
+      }
+
       config {
         image = "${artifact.image}:${artifact.tag}"
         ports = ["http"]
@@ -43,10 +47,6 @@ job "psc-context-sharing" {
             propagation = "rshared"
           }
         }
-      }
-
-      artifact {
-        source = "https://github.com/prosanteconnect/sharing-json-schemas/raw/main/json-schemas.zip"
       }
 
       # env variables
