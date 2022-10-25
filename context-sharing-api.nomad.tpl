@@ -38,15 +38,15 @@ job "psc-context-sharing" {
       config {
         image = "${artifact.image}:${artifact.tag}"
         ports = ["http"]
-        #mount {
-        #  type = "bind"
-        #  target = "/app/json-schemas-repo/patient-info.json"
-        #  source = "/local/patient-info.json"
-        #  readonly = "false"
-        #  bind_options {
-        #    propagation = "rshared"
-        #  }
-        #}
+        mount {
+          type = "bind"
+          target = "/app/json-schemas-repo/patient-info.json"
+          source = "/local/patient-info.json"
+          readonly = "false"
+          bind_options {
+            propagation = "rshared"
+          }
+        }
       }
 
       # env variables
