@@ -32,7 +32,7 @@ job "psc-context-sharing" {
       driver = "docker"
 
       artifact {
-        source = "https://github.com/prosanteconnect/sharing-json-schemas/raw/main/patient-info.json"
+        source = "https://github.com/prosanteconnect/sharing-json-schemas/raw/main/json-schemas.zip"
       }
 
       config {
