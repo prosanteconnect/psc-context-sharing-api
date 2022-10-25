@@ -84,7 +84,7 @@ public class ShareService {
                 log.error("Json-schema validation failed");
                 throw new PscSchemaException();
             }
-        } catch (JsonProcessingException | FileNotFoundException | IllegalArgumentException e) {
+        } catch (JsonProcessingException | FileNotFoundException e) {
             log.error(e instanceof JsonProcessingException ? "Submitted json-schema has format errors" : "Unknown schema submitted");
             throw new PscSchemaException();
         }
