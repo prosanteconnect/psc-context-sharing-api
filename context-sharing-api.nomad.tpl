@@ -36,7 +36,7 @@ job "psc-context-sharing" {
         ports = ["http"]
         mount {
           type = "bind"
-          target = "/app/json-schemas-repo/patient-info.json"
+          target = "/app/json-schemas-repo/json-schemas.zip"
           source = "/local/patient-info.json"
           readonly = "false"
           bind_options {
