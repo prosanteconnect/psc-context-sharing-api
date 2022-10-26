@@ -24,11 +24,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.mockito.Mockito;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.redis.AutoConfigureDataRedis;
-import org.springframework.boot.test.autoconfigure.data.redis.DataRedisTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -45,14 +43,13 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.LinkedHashMap;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -78,7 +75,7 @@ public class ShareControllerTest {
     @Autowired
     private PscAuthService authService;
 
-    private Gson gson = new Gson();
+    private ObjectMapper mapper = new ObjectMapper();
 
     private final String ACCEPT_HEADER = "Accept";
     private final String APPLICATION_JSON = "application/json";
@@ -197,7 +194,14 @@ public class ShareControllerTest {
                 .content(requestContentJson)
                 .characterEncoding(StandardCharsets.UTF_8))
                 .andExpect(status().is(200))
-                .andExpect(content().json(responseContentJson));
+                .andExpect(content().json(responseContentJson))
+                .andDo(print());
+
+        mockMvc.perform(get("/share")
+                .header(ACCEPT_HEADER, APPLICATION_JSON)
+                .header(AUTHORIZATION_HEADER, BEARER)
+                .contentType(APPLICATION_JSON))
+                .andDo(print());
     }
 
     @Test
@@ -216,8 +220,11 @@ public class ShareControllerTest {
                 .withPsNationalId("899700218896")
                 .build();
 
+//        Object bag = mapper.readValue("{\"ps\":{\"nationalId\":\"899700218896\"}}", Object.class);
+//        PscContext storedContext = new PscContext("899700218896", "patient-info", bag);
+
         pscContextRepository.save(storedContext);
-        String responseContentJson = gson.toJson(storedContext, PscContext.class);
+        String responseContentJson = mapper.writeValueAsString(storedContext);
 
         // get request
         ResultActions getRequest = mockMvc.perform(get("/share")

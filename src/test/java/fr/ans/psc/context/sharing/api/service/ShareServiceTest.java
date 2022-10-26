@@ -1,5 +1,7 @@
 package fr.ans.psc.context.sharing.api.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.ans.psc.context.sharing.api.ContextSharingApiApplication;
 import fr.ans.psc.context.sharing.api.exception.PscCacheException;
 import fr.ans.psc.context.sharing.api.exception.PscSchemaException;
@@ -14,13 +16,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
+
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.util.AssertionErrors.fail;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 @ContextConfiguration(classes = ContextSharingApiApplication.class)
 public class ShareServiceTest {
 
@@ -67,4 +73,5 @@ public class ShareServiceTest {
         Mockito.when(repository.save(pscContext)).thenThrow(RedisException.class);
         assertThrows(PscCacheException.class, () -> shareService.putPsContext(pscContext));
     }
+
 }

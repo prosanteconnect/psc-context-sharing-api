@@ -41,8 +41,10 @@ public class ShareService {
         PscContext saved;
         try {
             log.debug("Trying to save entry for key {} in Redis server...", pscContext.getPsId());
+            log.debug("bag class before : {}", pscContext.getBag().getClass());
             saved = pscContextRepository.save(pscContext);
             log.debug("Entry for key {} successfully saved", pscContext.getPsId());
+            log.debug("bag class after : {}", pscContext.getBag().getClass());
         } catch (Exception e) {
             log.error("Error occurred while requesting Redis server", e);
             throw new PscCacheException();
