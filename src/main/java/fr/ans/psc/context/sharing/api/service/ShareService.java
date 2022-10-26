@@ -1,7 +1,5 @@
 package fr.ans.psc.context.sharing.api.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.networknt.schema.JsonSchema;
 import com.networknt.schema.JsonSchemaFactory;
@@ -75,20 +73,16 @@ public class ShareService {
         try {
             JsonSchemaFactory factory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V4);
             File jsonSchemaFile = new File(schemasFileRepository, pscContext.getSchemaId() + ".json");
-            System.out.println(jsonSchemaFile.getAbsolutePath());
             InputStream inputStream = new FileInputStream(jsonSchemaFile);
             JsonSchema jsonSchema = factory.getSchema(inputStream);
 
-            String jsonString = mapper.writeValueAsString(pscContext.getBag());
-            JsonNode jsonNode = mapper.readTree(jsonString);
-
-            Set<ValidationMessage> errors = jsonSchema.validate(jsonNode);
+            Set<ValidationMessage> errors = jsonSchema.validate(pscContext.getBag());
             if (!errors.isEmpty()) {
                 log.error("Json-schema validation failed");
                 throw new PscSchemaException();
             }
-        } catch (JsonProcessingException | FileNotFoundException e) {
-            log.error(e instanceof JsonProcessingException ? "Submitted json-schema has format errors" : "Unknown schema submitted");
+        } catch (FileNotFoundException e) {
+            log.error("Unknown schema submitted");
             throw new PscSchemaException();
         }
     }

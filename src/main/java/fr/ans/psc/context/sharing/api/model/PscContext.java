@@ -1,6 +1,7 @@
 package fr.ans.psc.context.sharing.api.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 
@@ -9,21 +10,23 @@ import org.springframework.data.redis.core.RedisHash;
 public class PscContext {
     @Id
     @JsonProperty("psId")
-    String psId;
+    private String psId;
 
     @JsonProperty(value = "schemaId", required = true)
-    String schemaId;
+    private String schemaId;
 
+    // must be static because Jackson ObjectNode doesn't have default constructor,
+    // which leads to failures with SpringData
     @JsonProperty(value = "bag", required = true)
-    Object bag;
+    private static JsonNode bag;
 
     public PscContext() {
     }
 
-    public PscContext(String psId, String schemaId, Object bag) {
+    public PscContext(String psId, String schemaId, JsonNode baggie) {
         this.psId = psId;
         this.schemaId = schemaId;
-        this.bag = bag;
+        bag = baggie;
     }
 
     public String getPsId() {
@@ -42,11 +45,11 @@ public class PscContext {
         this.schemaId = schemaId;
     }
 
-    public Object getBag() {
+    public JsonNode getBag() {
         return bag;
     }
 
-    public void setBag(Object bag) {
-        this.bag = bag;
+    public void setBag(JsonNode baggie) {
+        bag = baggie;
     }
 }

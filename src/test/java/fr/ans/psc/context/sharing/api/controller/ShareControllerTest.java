@@ -3,23 +3,18 @@ package fr.ans.psc.context.sharing.api.controller;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
-import com.google.gson.Gson;
 import fr.ans.psc.context.sharing.api.ContextSharingApiApplication;
 import fr.ans.psc.context.sharing.api.TestRedisConfiguration;
-import fr.ans.psc.context.sharing.api.model.PatientInfo;
-import fr.ans.psc.context.sharing.api.model.Ps;
 import fr.ans.psc.context.sharing.api.model.PscContext;
-import fr.ans.psc.context.sharing.api.model.prosanteconnect.UserInfos;
 import fr.ans.psc.context.sharing.api.repository.PscContextRepository;
 import fr.ans.psc.context.sharing.api.service.PscAuthService;
 import fr.ans.psc.context.sharing.api.service.ShareService;
 import fr.ans.psc.context.sharing.api.utils.MemoryAppender;
-import fr.ans.psc.context.sharing.api.utils.PscContextBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,8 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.redis.AutoConfigureDataRedis;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
@@ -45,7 +38,6 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.LinkedHashMap;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
@@ -194,14 +186,7 @@ public class ShareControllerTest {
                 .content(requestContentJson)
                 .characterEncoding(StandardCharsets.UTF_8))
                 .andExpect(status().is(200))
-                .andExpect(content().json(responseContentJson))
-                .andDo(print());
-
-        mockMvc.perform(get("/share")
-                .header(ACCEPT_HEADER, APPLICATION_JSON)
-                .header(AUTHORIZATION_HEADER, BEARER)
-                .contentType(APPLICATION_JSON))
-                .andDo(print());
+                .andExpect(content().json(responseContentJson));
     }
 
     @Test
@@ -213,15 +198,8 @@ public class ShareControllerTest {
         httpMockServer.stubFor(WireMock.get("/userinfo").willReturn(aResponse().withStatus(200).withBody(userInfosJson)));
 
         // populate Redis
-        PscContext storedContext = new PscContextBuilder()
-                .withPsId("899700218896")
-                .withSchemaId("patient-info")
-                .withPatientInfoBag()
-                .withPsNationalId("899700218896")
-                .build();
-
-//        Object bag = mapper.readValue("{\"ps\":{\"nationalId\":\"899700218896\"}}", Object.class);
-//        PscContext storedContext = new PscContext("899700218896", "patient-info", bag);
+        JsonNode bag = mapper.readTree("{\"ps\":{\"nationalId\":\"899700218896\"}}");
+        PscContext storedContext = new PscContext("899700218896", "patient-info", bag);
 
         pscContextRepository.save(storedContext);
         String responseContentJson = mapper.writeValueAsString(storedContext);
@@ -233,7 +211,6 @@ public class ShareControllerTest {
                 .contentType(APPLICATION_JSON)
                 .characterEncoding(StandardCharsets.UTF_8))
                 .andExpect(status().is(200))
-                .andExpect(content().json(responseContentJson))
-                .andDo(print());
+                .andExpect(content().json(responseContentJson));
     }
 }
