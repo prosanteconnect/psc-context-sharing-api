@@ -55,7 +55,7 @@ public class PscAuthService {
         params.add("token", accessToken);
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(params, getHeadersIntrospection());
         ResponseEntity<String> result = restTemplate.postForEntity(pscUrlIntrospection, requestEntity, String.class);
-        log.debug("Appel ProSanteConnect Reponse: StatusCode {} \n body: {}", result.getStatusCode(),
+        log.debug("Appel ProSanteConnect Reponse: StatusCode {} \n Introspection: {}", result.getStatusCode(),
                 result.getBody());
 
         parsePscResponse(result.getBody());
@@ -70,7 +70,7 @@ public class PscAuthService {
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(getHeadersUserInfo(accessToken));
         ResponseEntity<String> result = restTemplate.exchange(pscUrlUserInfo, HttpMethod.GET, requestEntity, String.class);
 
-        log.debug("Appel ProSanteConnect pour getUserInfo. Reponse: StatusCode {} \n body: {}", result.getStatusCode(),
+        log.debug("Appel ProSanteConnect pour getUserInfo. Reponse: StatusCode {} \n UserInfos: {}", result.getStatusCode(),
                 result.getBody());
 
         UserInfos ui;
