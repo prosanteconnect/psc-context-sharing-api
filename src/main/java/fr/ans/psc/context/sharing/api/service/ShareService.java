@@ -56,6 +56,7 @@ public class ShareService {
         try {
             log.debug("requesting Redis server for key {}...", nationalId);
             optionalContext = pscContextRepository.findById(nationalId);
+            log.debug("response received from Redis server for key {}", nationalId);
         } catch (Exception e) {
             log.error("Error occurred while requesting Redis server", e);
             throw new PscCacheException();
