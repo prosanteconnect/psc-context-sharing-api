@@ -39,12 +39,11 @@ import org.springframework.web.context.WebApplicationContext;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -177,6 +176,29 @@ public class ShareControllerTest {
         // mock API calls
         String requestContentJson = "{\"schemaId\":\"patient-info\",\"bag\":{\"ps\":{\"nationalId\":\"123\"}}}";
         String responseContentJson = "{\"psId\":\"899700218896\",\"schemaId\":\"patient-info\",\"bag\":{\"ps\":{\"nationalId\":\"123\"}}}";
+
+        // put request
+        ResultActions putRequest = mockMvc.perform(put("/share")
+                .header(ACCEPT_HEADER, APPLICATION_JSON)
+                .header(AUTHORIZATION_HEADER, BEARER)
+                .contentType(APPLICATION_JSON)
+                .content(requestContentJson)
+                .characterEncoding(StandardCharsets.UTF_8))
+                .andExpect(status().is(200))
+                .andExpect(content().json(responseContentJson));
+    }
+
+    @Test
+    @DisplayName("put PscContext OK")
+    public void putContextDeeperTest() throws Exception {
+        // mock ProSanteConnect calls
+        String userInfosJson = Files.readString(new ClassPathResource("userInfos.json").getFile().toPath());
+        httpMockServer.stubFor(WireMock.post("/token/introspect").willReturn(aResponse().withStatus(200).withBody("{\"active\":\"true\"}")));
+        httpMockServer.stubFor(WireMock.get("/userinfo").willReturn(aResponse().withStatus(200).withBody(userInfosJson)));
+
+        // mock API calls
+        String requestContentJson = "{\"schemaId\":\"alt\",\"bag\":{\"ps\":{\"nationalId\":\"123\",\"health_structure\":{\"structureTechnicalId\":\"456\"}}}}";
+        String responseContentJson = "{\"psId\":\"899700218896\",\"schemaId\":\"alt\",\"bag\":{\"ps\":{\"nationalId\":\"123\",\"health_structure\":{\"structureTechnicalId\":\"456\"}}}}";
 
         // put request
         ResultActions putRequest = mockMvc.perform(put("/share")

@@ -22,13 +22,13 @@
       "type": "object",
       "properties": {
         "nationalId": {"type":  "string"},
-        "structure": {
+        "health_structure": {
           "title": "Structure de soins",
           "description": "",
           "$ref": "#/$defs/health_structure"
         }
       },
-      "required": ["nationalId"],
+      "required": ["nationalId","health_structure"],
       "additionalProperties": false
     },
     "patient": {
