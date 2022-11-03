@@ -20,6 +20,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
+@CrossOrigin
 @RequestMapping("/share")
 public class ShareController {
 
