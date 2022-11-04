@@ -33,12 +33,16 @@ job "psc-context-sharing" {
 
       artifact {
         source = "https://github.com/prosanteconnect/sharing-json-schemas/raw/main/patient-info.json"
-        archive = "false"
+        options {
+          archive = "false"
+        }
       }
       
       artifact {
         source = "https://github.com/prosanteconnect/sharing-json-schemas/raw/main/alt.json"
-        archive = "false"
+        options {
+          archive = "false"
+        }
       }
 
       config {
