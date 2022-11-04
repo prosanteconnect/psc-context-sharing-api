@@ -32,7 +32,13 @@ job "psc-context-sharing" {
       driver = "docker"
 
       artifact {
-        source = "https://github.com/prosanteconnect/sharing-json-schemas/raw/main/json-schemas.zip"
+        source = "https://github.com/prosanteconnect/sharing-json-schemas/raw/main/patient-info.json"
+        archive = "false"
+      }
+      
+      artifact {
+        source = "https://github.com/prosanteconnect/sharing-json-schemas/raw/main/alt.json"
+        archive = "false"
       }
 
       config {
@@ -42,6 +48,15 @@ job "psc-context-sharing" {
           type = "bind"
           target = "/app/json-schemas-repo/patient-info.json"
           source = "local/patient-info.json"
+          readonly = "false"
+          bind_options {
+            propagation = "rshared"
+          }
+        }
+        mount {
+          type = "bind"
+          target = "/app/json-schemas-repo/alt.json"
+          source = "local/alt.json"
           readonly = "false"
           bind_options {
             propagation = "rshared"
