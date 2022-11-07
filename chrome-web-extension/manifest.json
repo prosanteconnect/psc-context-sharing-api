@@ -1,0 +1,25 @@
+{
+  "manifest_version": 2,
+  "name": "Partage de contexte ProSanteConnect",
+  "description": "Extension permettant le partage multi-applis web de données contextuelles, adossées à ProSanteConnect",
+  "version": "0.1",
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["context-sharing.js"]
+    }
+  ],
+  "browser_action": {
+    "default_icon": "icon.png",
+    "default_popup": "popup.html",
+    "default_title": "Prévisualisation du formulaire"
+  },
+  "permissions": [
+    "identity",
+    "storage",
+    "https://*/*"
+  ]
+}
