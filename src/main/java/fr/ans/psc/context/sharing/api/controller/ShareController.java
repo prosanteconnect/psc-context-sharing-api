@@ -35,9 +35,9 @@ public class ShareController {
         try {
             log.debug("Get context requested");
             String accessToken = getAccessToken();
-            String nationalId = authService.introspectPscAccesToken(accessToken);
-            log.debug("PS key is {}", nationalId);
-            PscContext pscContext = shareService.getPscContext(nationalId);
+//            String nationalId = authService.introspectPscAccesToken(accessToken);
+            log.debug("PS key is {}", accessToken);
+            PscContext pscContext = shareService.getPscContext(accessToken);
             return new ResponseEntity<>(pscContext, HttpStatus.OK);
         } catch (PscContextSharingException e) {
             return new ResponseEntity<>(e.getStatus());
@@ -49,10 +49,10 @@ public class ShareController {
         try {
             log.debug("Put context requested");
             String accessToken = getAccessToken();
-            String nationalId = authService.introspectPscAccesToken(accessToken);
-            log.debug("PS key is {}", nationalId);
+//            String nationalId = authService.introspectPscAccesToken(accessToken);
+            log.debug("PS key is {}", accessToken);
             PscContext toStore = new PscContext(null, pscContext.getSchemaId(), pscContext.getBag());
-            toStore.setPsId(nationalId);
+            toStore.setPsId(accessToken);
             PscContext savedContext = shareService.putPsContext(toStore);
             return new ResponseEntity<>(savedContext, HttpStatus.OK);
         } catch (PscContextSharingException e) {
